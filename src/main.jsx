@@ -16,7 +16,7 @@ const queryClient = new QueryClient()
 const config = getDefaultConfig({
   appName: "BaseParkVault",
   // CATATAN: Pastikan ini adalah Project ID dari WalletConnect Cloud (bukan address dompet)
-  projectId: "0xd2f9411079a3362d3e20cef1719cf2d8a3923d8d", 
+  projectId: "766cbd364adce0a339344216092628d5", 
   chains: [base],
   ssr: true, // Tambahkan ini jika kamu berencana menggunakan Next.js nantinya
 })
