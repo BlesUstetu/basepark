@@ -26,7 +26,7 @@ body {
 
 .container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
 .hero { text-align: center; margin-bottom: 40px; }
-.subtitle { color: var(--text-dim); margin-top: 5px; }
+.subtitle { color: var(--text-dim); }
 
 .dashboard-grid { display: grid; grid-template-columns: 1fr 1.4fr; gap: 30px; }
 
@@ -45,18 +45,20 @@ body {
   border: 1px solid var(--glass-border);
 }
 .balance-item { display: flex; justify-content: space-between; font-size: 0.85rem; }
-.balance-item.highlighted { color: var(--primary); font-weight: 800; border-top: 1px solid var(--glass-border); padding-top: 8px; margin-top: 5px; }
+.balance-item.highlighted { color: var(--primary); font-weight: 800; border-top: 1px solid var(--glass-border); padding-top: 10px; margin-top: 5px; }
 
-.input-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-weight: 800; font-size: 0.75rem; color: var(--text-dim); }
-.max-buttons { display: flex; gap: 8px; }
+/* INPUT HEADER & MAX BUTTONS */
+.input-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-weight: 800; font-size: 0.75rem; color: var(--text-dim); }
+.max-buttons-wrapper { display: flex; gap: 8px; }
 
 .btn-max {
   background: rgba(255,255,255,0.05); border: 1px solid; border-radius: 6px; cursor: pointer; padding: 3px 10px; font-size: 0.65rem; font-weight: bold; transition: 0.3s;
 }
 .btn-max.dep { border-color: var(--primary); color: var(--primary); }
 .btn-max.with { border-color: var(--error); color: var(--error); }
-.btn-max:hover { background: white; color: black !important; }
+.btn-max:hover { background: white; color: black !important; transform: translateY(-2px); }
 
+/* INPUT FIELD RAKSASA */
 .vault-input {
   width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.7); border: 2px solid var(--glass-border);
   padding: 22px; border-radius: 20px; color: var(--primary); font-size: 2.4rem; font-weight: 900;
@@ -64,10 +66,11 @@ body {
 }
 .vault-input:focus { border-color: var(--primary); box-shadow: 0 0 30px rgba(0, 255, 204, 0.2); }
 
+/* BUTTON GROUP (DEPOSIT & WITHDRAW) */
 .button-group { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
 
 .raksasa {
-  padding: 22px; border-radius: 18px; font-size: 1.3rem; font-weight: 900; text-transform: uppercase;
+  padding: 22px; border-radius: 18px; font-size: 1.2rem; font-weight: 900; text-transform: uppercase;
   cursor: pointer; border: none; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
@@ -75,7 +78,6 @@ body {
 .btn-withdraw { background: linear-gradient(90deg, var(--error), #ff8e53); color: white; box-shadow: 0 8px 20px rgba(255,77,77,0.25); }
 
 .raksasa:hover { transform: translateY(-6px); filter: brightness(1.2); }
-.raksasa:active { transform: scale(0.95); }
 .raksasa:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
 .btn-claim {
@@ -87,8 +89,6 @@ body {
 
 .status-pill { font-size: 0.65rem; padding: 3px 10px; border-radius: 20px; background: rgba(255,255,255,0.05); color: var(--text-dim); }
 .status-pill.active { color: var(--primary); background: rgba(0, 255, 204, 0.1); }
-
-.hint { font-size: 0.75rem; color: var(--text-dim); text-align: center; margin-top: 15px; font-style: italic; }
 
 .hot-toast-bar { background: #121418 !important; color: white !important; border: 1px solid var(--glass-border) !important; border-radius: 12px !important; }
 
