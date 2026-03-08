@@ -3,28 +3,52 @@
   --primary: #00ffcc;
   --error: #ff4d4d;
   --glass-border: rgba(255, 255, 255, 0.1);
+  --text-dim: #8899a6;
 }
 
-body { margin: 0; background: var(--bg); color: white; font-family: 'Inter', sans-serif; }
+body {
+  margin: 0;
+  background-color: var(--bg);
+  color: white;
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+}
 
-.navbar { display: flex; justify-content: space-between; padding: 20px 5%; border-bottom: 1px solid var(--glass-border); }
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  padding: 15px 5%;
+  border-bottom: 1px solid var(--glass-border);
+  backdrop-filter: blur(10px);
+}
+
 .logo { font-weight: 900; letter-spacing: 2px; }
 .logo span { color: var(--primary); text-shadow: 0 0 10px var(--primary); }
 
 .container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
-.dashboard-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 30px; }
+.dashboard-grid { display: grid; grid-template-columns: 1fr 1.4fr; gap: 30px; }
 
 .glass-card {
-  background: rgba(255, 255, 255, 0.03); border: 1px solid var(--glass-border);
-  border-radius: 28px; padding: 30px; backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--glass-border);
+  border-radius: 28px;
+  padding: 30px;
+  backdrop-filter: blur(20px);
 }
 
-.balance-info { background: rgba(0,0,0,0.4); padding: 15px; border-radius: 15px; margin-bottom: 25px; }
-.balance-item { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 5px; color: #8899a6; }
+.balance-info {
+  background: rgba(0,0,0,0.4);
+  padding: 18px;
+  border-radius: 18px;
+  margin-bottom: 25px;
+  border: 1px solid var(--glass-border);
+}
+
+.balance-item { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 8px; color: var(--text-dim); }
 .highlighted { color: var(--primary) !important; font-weight: 800; border-top: 1px solid var(--glass-border); padding-top: 10px; margin-top: 5px; }
 
-/* HEADER INPUT: KIRI (MAX WITH) - TENGAH (LABEL) - KANAN (MAX DEP) */
-.input-header-final {
+/* --- SISTEM HEADER SIMETRIS --- */
+.input-header-fixed {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -32,19 +56,21 @@ body { margin: 0; background: var(--bg); color: white; font-family: 'Inter', san
   margin-bottom: 15px;
 }
 
-.col-left, .col-right { flex: 1; display: flex; }
+.header-col { flex: 1; display: flex; }
+.col-left { justify-content: flex-start; }
 .col-right { justify-content: flex-end; }
-.col-center { flex: 2; text-align: center; }
+.col-center { flex: 2; justify-content: center; }
 
-.label-text {
-  font-size: 0.75rem;
+.label-center-text {
+  font-size: 0.7rem;
   font-weight: 800;
-  color: #8899a6;
+  color: var(--text-dim);
   letter-spacing: 2px;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
-.btn-max-action {
+.btn-max-final {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid;
   border-radius: 6px;
@@ -56,24 +82,51 @@ body { margin: 0; background: var(--bg); color: white; font-family: 'Inter', san
   transition: 0.2s;
 }
 
-.btn-max-action.with { border-color: var(--error); color: var(--error); }
-.btn-max-action.dep { border-color: var(--primary); color: var(--primary); }
-.btn-max-action:hover { background: white; color: black !important; }
+.btn-max-final.with { border-color: var(--error); color: var(--error); }
+.btn-max-final.dep { border-color: var(--primary); color: var(--primary); }
+.btn-max-final:hover { background: white; color: black !important; transform: translateY(-2px); }
 
-/* INPUT & TOMBOL RAKSASA */
-.vault-input-raksasa {
-  width: 100%; box-sizing: border-box; background: #000; border: 2px solid var(--glass-border);
-  padding: 25px; border-radius: 20px; color: var(--primary); font-size: 2.8rem; font-weight: 900;
-  text-align: center; margin-bottom: 25px; outline: none;
+/* --- INPUT & TOMBOL RAKSASA --- */
+.vault-input-massive {
+  width: 100%;
+  box-sizing: border-box;
+  background: #000;
+  border: 2px solid var(--glass-border);
+  padding: 25px;
+  border-radius: 20px;
+  color: var(--primary);
+  font-size: 2.8rem;
+  font-weight: 900;
+  text-align: center;
+  margin-bottom: 25px;
+  outline: none;
 }
 
-.button-group-final { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+.action-buttons-massive { display: flex; flex-direction: column; gap: 15px; }
 
-.btn-main-deposit, .btn-main-withdraw {
-  padding: 22px; border-radius: 18px; border: none; font-weight: 900; font-size: 1.2rem; cursor: pointer; transition: 0.3s;
+.btn-withdraw-massive, .btn-deposit-massive {
+  width: 100%;
+  padding: 22px;
+  border-radius: 18px;
+  border: none;
+  font-weight: 900;
+  font-size: 1.2rem;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: 0.3s;
 }
 
-.btn-main-deposit { background: var(--primary); color: #000; }
-.btn-main-withdraw { background: var(--error); color: #fff; }
+.btn-withdraw-massive { background: var(--error); color: white; }
+.btn-deposit-massive { background: var(--primary); color: #000; }
 
-.btn-main-deposit:hover, .btn-main-withdraw:hover { transform: translateY(-5px); filter: brightness(1.2); }
+.btn-withdraw-massive:hover, .btn-deposit-massive:hover {
+  filter: brightness(1.2);
+  transform: translateY(-3px);
+}
+
+.btn-withdraw-massive:disabled, .btn-deposit-massive:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+@media (max-width: 900px) {
+  .dashboard-grid { grid-template-columns: 1fr; }
+  .label-center-text { font-size: 0.6rem; letter-spacing: 1px; }
+}
