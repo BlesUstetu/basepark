@@ -14,7 +14,7 @@ import toast, { Toaster } from "react-hot-toast";
 import NeonTitle from "./components/NeonTitle";
 import TVLChart from "./components/TVLChart";
 
-// KONFIGURASI KONTRAK (GANTI DENGAN DATA REMIX)
+// KONFIGURASI KONTRAK (PASTIKAN ALAMAT & ABI BENAR)
 const CONTRACT_ADDRESS = "0xd2f9411079a3362d3e20cef1719cf2d8a3923d8d"; 
 const CONTRACT_ABI = [ /* PASTE ABI JSON DARI REMIX DISINI */ ];
 
@@ -22,10 +22,10 @@ export default function App() {
   const { address, isConnected } = useAccount();
   const [amount, setAmount] = useState("");
 
-  // 1. Ambil Saldo Wallet (ETH di Dompet)
+  // 1. Ambil Saldo Wallet (Ini yang memunculkan angka 0.0004 ETH di gambar kamu)
   const { data: userBalance } = useBalance({ address });
 
-  // 2. Ambil Saldo Vault (ETH yang sudah di-Staking)
+  // 2. Ambil Saldo yang sudah didepositkan ke Vault
   const { data: vaultBalance } = useReadContract({
     address: CONTRACT_ADDRESS,
     abi: CONTRACT_ABI,
@@ -34,8 +34,6 @@ export default function App() {
   });
 
   const { data: hash, writeContract, isPending } = useWriteContract();
-
-  // 3. Monitor Status Transaksi
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash });
 
   useEffect(() => {
@@ -47,44 +45,28 @@ export default function App() {
     }
   }, [isPending, isConfirming, isConfirmed]);
 
-  // FUNGSI AKSI
-  const handleDeposit = () => {
+  const handleAction = (type) => {
     if (!amount || amount === "0") return toast.error("Enter an amount!");
     writeContract({
       address: CONTRACT_ADDRESS,
       abi: CONTRACT_ABI,
-      functionName: 'deposit', 
-      value: parseEther(amount),
-    });
-  };
-
-  const handleWithdraw = () => {
-    if (!amount || amount === "0") return toast.error("Enter an amount!");
-    writeContract({
-      address: CONTRACT_ADDRESS,
-      abi: CONTRACT_ABI,
-      functionName: 'withdraw',
-      args: [parseEther(amount)],
+      functionName: type, 
+      ...(type === 'deposit' ? { value: parseEther(amount) } : { args: [parseEther(amount)] }),
     });
   };
 
   return (
     <div className="app-shell">
-      <Toaster position="top-center" toastOptions={{ className: 'hot-toast-bar' }} />
-      
+      <Toaster position="top-center" />
       <nav className="navbar">
         <div className="logo">BASEPARK<span>VAULT</span></div>
-        <ConnectButton label="Connect Wallet" />
+        <ConnectButton />
       </nav>
 
       <main className="container">
-        <div className="hero">
-          <NeonTitle />
-          <p className="subtitle">High-Yield Autonomous Vault on Base Network</p>
-        </div>
+        <div className="hero"><NeonTitle /></div>
 
         <div className="dashboard-grid">
-          {/* VAULT INTERACTION CARD */}
           <div className="glass-card vault-card">
             <div className="card-header">
               <h3 className="card-title">Vault Interface</h3>
@@ -95,18 +77,18 @@ export default function App() {
 
             <div className="balance-info">
               <div className="balance-item">
-                <span className="label">Wallet Balance</span>
-                <span className="value">{userBalance ? Number(userBalance.formatted).toFixed(5) : "0.000"} ETH</span>
+                <span>Wallet Balance</span>
+                <span>{userBalance ? Number(userBalance.formatted).toFixed(6) : "0"} ETH</span>
               </div>
               <div className="balance-item highlighted">
-                <span className="label">Staked in Vault</span>
-                <span className="value">{vaultBalance ? Number(formatEther(vaultBalance)).toFixed(5) : "0.000"} ETH</span>
+                <span>Staked in Vault</span>
+                <span>{vaultBalance ? Number(formatEther(vaultBalance)).toFixed(6) : "0"} ETH</span>
               </div>
             </div>
             
             <div className="deposit-box">
               <div className="input-header">
-                <label>AMOUNT (ETH)</label>
+                <label>AMOUNT TO PROCESS</label>
                 <div className="max-buttons-wrapper">
                   <button className="btn-max dep" onClick={() => setAmount(userBalance?.formatted || "0")}>MAX DEP</button>
                   <button className="btn-max with" onClick={() => setAmount(vaultBalance ? formatEther(vaultBalance) : "0")}>MAX WITH</button>
@@ -119,25 +101,19 @@ export default function App() {
               />
               
               <div className="button-group">
-                <button className="btn-withdraw raksasa" onClick={handleWithdraw} disabled={isPending || isConfirming}>
-                  {isConfirming ? "Wait..." : "Withdraw"}
+                <button className="btn-withdraw" onClick={() => handleAction('withdraw')} disabled={isPending || isConfirming}>
+                  Withdraw
                 </button>
-                <button className="btn-deposit raksasa" onClick={handleDeposit} disabled={isPending || isConfirming}>
-                  {isConfirming ? "Wait..." : "Deposit"}
+                <button className="btn-deposit" onClick={() => handleAction('deposit')} disabled={isPending || isConfirming}>
+                  Deposit
                 </button>
               </div>
-
-              <button className="btn-claim" onClick={() => toast.success("Rewards Claimed! ✨")}>
-                ✨ Claim Accumulating Rewards
-              </button>
             </div>
           </div>
 
-          {/* PERFORMANCE CHART CARD */}
-          <div className="glass-card chart-card">
-            <h3 className="card-title">Live TVL Growth</h3>
+          <div className="glass-card">
+            <h3 className="card-title">Protocol Growth</h3>
             <TVLChart />
-            <p className="hint">Data updates in real-time from Base Network</p>
           </div>
         </div>
       </main>
