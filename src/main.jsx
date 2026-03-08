@@ -12,7 +12,7 @@ import { base } from "wagmi/chains"
 
 const config = getDefaultConfig({
   appName: "BaseParkVault",
-  projectId: "YOUR_WALLETCONNECT_PROJECT_ID",
+  projectId: "0xd2f9411079a3362d3e20cef1719cf2d8a3923d8d",
   chains: [base]
 })
 
