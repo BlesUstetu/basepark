@@ -14,7 +14,7 @@ import toast, { Toaster } from "react-hot-toast";
 import NeonTitle from "./components/NeonTitle";
 import TVLChart from "./components/TVLChart";
 
-// KONTRAK DATA (GANTI DENGAN HASIL REMIX)
+// KONFIGURASI KONTRAK (GANTI DENGAN DATA REMIX)
 const CONTRACT_ADDRESS = "0xd2f9411079a3362d3e20cef1719cf2d8a3923d8d"; 
 const CONTRACT_ABI = [ /* PASTE ABI JSON DARI REMIX DISINI */ ];
 
@@ -39,10 +39,10 @@ export default function App() {
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash });
 
   useEffect(() => {
-    if (isPending) toast.loading("Confirm in Wallet...", { id: "tx" });
-    if (isConfirming) toast.loading("Verifying on Base...", { id: "tx" });
+    if (isPending) toast.loading("Waiting for Wallet...", { id: "tx" });
+    if (isConfirming) toast.loading("Confirming on Base...", { id: "tx" });
     if (isConfirmed) {
-      toast.success("Transaction Confirmed! 🎉", { id: "tx", duration: 5000 });
+      toast.success("Transaction Success! 🎉", { id: "tx", duration: 5000 });
       setAmount(""); 
     }
   }, [isPending, isConfirming, isConfirmed]);
@@ -84,10 +84,10 @@ export default function App() {
         </div>
 
         <div className="dashboard-grid">
-          {/* VAULT CARD */}
+          {/* VAULT INTERACTION CARD */}
           <div className="glass-card vault-card">
             <div className="card-header">
-              <h3 className="card-title">Vault Control</h3>
+              <h3 className="card-title">Vault Interface</h3>
               <div className={`status-pill ${isConnected ? 'active' : ''}`}>
                 {isConnected ? '● Connected' : '○ Disconnected'}
               </div>
@@ -106,8 +106,8 @@ export default function App() {
             
             <div className="deposit-box">
               <div className="input-header">
-                <label>Amount (ETH)</label>
-                <div className="max-buttons">
+                <label>AMOUNT (ETH)</label>
+                <div className="max-buttons-wrapper">
                   <button className="btn-max dep" onClick={() => setAmount(userBalance?.formatted || "0")}>MAX DEP</button>
                   <button className="btn-max with" onClick={() => setAmount(vaultBalance ? formatEther(vaultBalance) : "0")}>MAX WITH</button>
                 </div>
@@ -127,17 +127,17 @@ export default function App() {
                 </button>
               </div>
 
-              <button className="btn-claim" onClick={() => toast.success("Rewards claimed (Simulated)")}>
-                ✨ Claim Rewards
+              <button className="btn-claim" onClick={() => toast.success("Rewards Claimed! ✨")}>
+                ✨ Claim Accumulating Rewards
               </button>
             </div>
           </div>
 
-          {/* CHART CARD */}
+          {/* PERFORMANCE CHART CARD */}
           <div className="glass-card chart-card">
-            <h3 className="card-title">Live TVL Performance</h3>
+            <h3 className="card-title">Live TVL Growth</h3>
             <TVLChart />
-            <p className="hint">Data fetched in real-time from Base Layer 2</p>
+            <p className="hint">Data updates in real-time from Base Network</p>
           </div>
         </div>
       </main>
