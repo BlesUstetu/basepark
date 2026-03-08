@@ -1,50 +1,50 @@
 :root {
   --bg: #030508;
   --primary: #00ffcc;
-  --error: #ff7e5f;
+  --error: #ff4d4d;
   --glass-border: rgba(255, 255, 255, 0.1);
 }
 
 body { margin: 0; background: var(--bg); color: white; font-family: 'Inter', sans-serif; }
 
-/* Dashboard Layout */
-.dashboard-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 25px; padding: 20px; }
+.dashboard-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 25px; padding: 20px; max-width: 1200px; margin: 0 auto; }
 
-/* Card Style */
 .glass-card {
   background: rgba(255, 255, 255, 0.03); border: 1px solid var(--glass-border);
-  border-radius: 24px; padding: 25px; backdrop-filter: blur(10px);
+  border-radius: 24px; padding: 30px; backdrop-filter: blur(10px);
 }
 
-/* Balance Section */
-.balance-info { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 15px; margin-bottom: 20px; }
-.balance-item { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 5px; color: #8899a6; }
-.highlighted { color: var(--primary) !important; font-weight: bold; border-top: 1px solid rgba(255,255,255,0.1); pt: 10px; }
+/* Balance */
+.balance-info { background: rgba(0,0,0,0.4); padding: 15px; border-radius: 15px; margin-bottom: 25px; }
+.balance-item { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 8px; color: #8899a6; }
+.highlighted { color: var(--primary) !important; font-weight: bold; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; margin-top: 5px; }
 
-/* Input Header & MAX Buttons */
-.input-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 0.75rem; font-weight: 800; color: #8899a6; }
+/* Input Header & Max Buttons */
+.input-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-weight: 800; font-size: 0.7rem; color: #8899a6; }
 .max-buttons-wrapper { display: flex; gap: 8px; }
 
 .btn-max {
-  background: rgba(255,255,255,0.05); border: 1px solid; border-radius: 6px; cursor: pointer;
-  padding: 3px 8px; font-size: 0.65rem; font-weight: bold; transition: 0.2s;
+  background: rgba(255,255,255,0.05); border: 1px solid; border-radius: 6px; cursor: pointer; padding: 3px 10px; font-size: 0.65rem; font-weight: bold; transition: 0.2s;
 }
 .btn-max.dep { border-color: var(--primary); color: var(--primary); }
 .btn-max.with { border-color: var(--error); color: var(--error); }
 .btn-max:hover { background: white; color: black !important; }
 
-/* Main Input */
+/* Input & Big Buttons */
 .vault-input {
   width: 100%; box-sizing: border-box; background: #000; border: 2px solid var(--glass-border);
-  padding: 20px; border-radius: 15px; color: var(--primary); font-size: 2rem; font-weight: 900;
-  text-align: center; margin-bottom: 20px;
+  padding: 25px; border-radius: 20px; color: var(--primary); font-size: 2.5rem; font-weight: 900;
+  text-align: center; margin-bottom: 25px; outline: none;
 }
+.vault-input:focus { border-color: var(--primary); }
 
-/* Big Buttons */
-.button-group { display: flex; flex-direction: column; gap: 12px; }
-.btn-deposit, .btn-withdraw {
-  padding: 20px; border-radius: 15px; border: none; font-weight: 900; font-size: 1.1rem; cursor: pointer; transition: 0.3s;
+.button-group { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
+.btn-raksasa-deposit, .btn-raksasa-withdraw {
+  padding: 22px; border-radius: 18px; border: none; font-weight: 900; font-size: 1.2rem; cursor: pointer; transition: 0.3s; text-transform: uppercase;
 }
-.btn-deposit { background: var(--primary); color: #000; }
-.btn-withdraw { background: var(--error); color: white; }
-.btn-deposit:hover, .btn-withdraw:hover { transform: translateY(-3px); filter: brightness(1.1); }
+.btn-raksasa-deposit { background: linear-gradient(90deg, var(--primary), #00d4ff); color: #000; }
+.btn-raksasa-withdraw { background: linear-gradient(90deg, var(--error), #ff8e53); color: #fff; }
+
+.btn-raksasa-deposit:hover, .btn-raksasa-withdraw:hover { transform: translateY(-5px); filter: brightness(1.1); }
+.btn-raksasa-deposit:disabled, .btn-raksasa-withdraw:disabled { opacity: 0.4; cursor: not-allowed; }
