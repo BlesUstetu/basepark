@@ -10,19 +10,16 @@ import {
 import { parseEther, formatEther } from "viem";
 import toast, { Toaster } from "react-hot-toast";
 
-// KOMPONEN (Pastikan file ini ada di folder /src/components/)
 import NeonTitle from "./components/NeonTitle";
 import TVLChart from "./components/TVLChart";
 
-// KONFIGURASI KONTRAK (GANTI DENGAN DATA REMIX)
 const CONTRACT_ADDRESS = "0xd2f9411079a3362d3e20cef1719cf2d8a3923d8d"; 
-const CONTRACT_ABI = [ /* ABI JSON DARI REMIX */ ];
+const CONTRACT_ABI = [ /* PASTE ABI JSON DARI REMIX */ ];
 
 export default function App() {
   const { address, isConnected } = useAccount();
   const [amount, setAmount] = useState("");
 
-  // Ambil Saldo Wallet & Saldo Vault
   const { data: userBalance } = useBalance({ address });
   const { data: vaultBalance } = useReadContract({
     address: CONTRACT_ADDRESS,
@@ -35,16 +32,16 @@ export default function App() {
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash });
 
   useEffect(() => {
-    if (isPending) toast.loading("Waiting for Wallet...", { id: "tx" });
-    if (isConfirming) toast.loading("Confirming on Base...", { id: "tx" });
+    if (isPending) toast.loading("Confirm in Wallet...", { id: "tx" });
+    if (isConfirming) toast.loading("Verifying on Base...", { id: "tx" });
     if (isConfirmed) {
-      toast.success("Success! 🎉", { id: "tx", duration: 4000 });
+      toast.success("Transaction Confirmed! 🎉", { id: "tx", duration: 5000 });
       setAmount(""); 
     }
   }, [isPending, isConfirming, isConfirmed]);
 
   const handleAction = (type) => {
-    if (!amount || amount === "0") return toast.error("Enter amount!");
+    if (!amount || amount === "0") return toast.error("Enter an amount!");
     writeContract({
       address: CONTRACT_ADDRESS,
       abi: CONTRACT_ABI,
@@ -56,47 +53,68 @@ export default function App() {
   return (
     <div className="app-shell">
       <Toaster position="top-center" />
+      
       <nav className="navbar">
         <div className="logo">BASEPARK<span>VAULT</span></div>
-        <ConnectButton />
+        <ConnectButton label="Connect Wallet" />
       </nav>
 
       <main className="container">
-        <div className="hero"><NeonTitle /></div>
+        <div className="hero">
+          <NeonTitle />
+          <p className="subtitle">High-Yield Autonomous Vault on Base Network</p>
+        </div>
 
         <div className="dashboard-grid">
           <div className="glass-card vault-card">
+            <div className="card-header">
+              <h3 className="card-title">Vault Interface</h3>
+              <div className={`status-pill ${isConnected ? 'active' : ''}`}>
+                {isConnected ? '● Online' : '○ Offline'}
+              </div>
+            </div>
+
             <div className="balance-info">
               <div className="balance-item">
                 <span>Wallet Balance</span>
-                <span>{userBalance ? Number(userBalance.formatted).toFixed(6) : "0"} ETH</span>
+                <span>{userBalance ? Number(userBalance.formatted).toFixed(5) : "0.000"} ETH</span>
               </div>
               <div className="balance-item highlighted">
                 <span>Staked in Vault</span>
-                <span>{vaultBalance ? Number(formatEther(vaultBalance)).toFixed(6) : "0"} ETH</span>
+                <span>{vaultBalance ? Number(formatEther(vaultBalance)).toFixed(5) : "0.000"} ETH</span>
               </div>
             </div>
             
             <div className="deposit-box">
-              <div className="input-header">
-                <label>AMOUNT TO PROCESS</label>
-                {/* DUA TOMBOL MAX DISINI */}
-                <div className="max-buttons-wrapper">
-                  <button className="btn-max dep" onClick={() => setAmount(userBalance?.formatted || "0")}>MAX DEP</button>
-                  <button className="btn-max with" onClick={() => setAmount(vaultBalance ? formatEther(vaultBalance) : "0")}>MAX WITH</button>
-                </div>
+              {/* LAYOUT TIGA KOLOM: KIRI - TENGAH - KANAN */}
+              <div className="input-header-row">
+                <button 
+                  className="btn-max-small with" 
+                  onClick={() => setAmount(vaultBalance ? formatEther(vaultBalance) : "0")}
+                >
+                  MAX WITH
+                </button>
+
+                <span className="input-label">AMOUNT TO PROCESS</span>
+
+                <button 
+                  className="btn-max-small dep" 
+                  onClick={() => setAmount(userBalance?.formatted || "0")}
+                >
+                  MAX DEP
+                </button>
               </div>
 
               <input 
-                type="number" placeholder="0.00" className="vault-input"
+                type="number" placeholder="0.00" className="vault-input-raksasa"
                 value={amount} onChange={(e) => setAmount(e.target.value)}
               />
               
-              <div className="button-group">
-                <button className="btn-raksasa-withdraw" onClick={() => handleAction('withdraw')} disabled={isPending || isConfirming}>
+              <div className="button-group-raksasa">
+                <button className="btn-final-withdraw" onClick={() => handleAction('withdraw')} disabled={isPending || isConfirming}>
                   Withdraw
                 </button>
-                <button className="btn-raksasa-deposit" onClick={() => handleAction('deposit')} disabled={isPending || isConfirming}>
+                <button className="btn-final-deposit" onClick={() => handleAction('deposit')} disabled={isPending || isConfirming}>
                   Deposit
                 </button>
               </div>
@@ -104,7 +122,7 @@ export default function App() {
           </div>
 
           <div className="glass-card">
-            <h3 className="card-title">Vault Performance</h3>
+            <h3 className="card-title">Live TVL Growth</h3>
             <TVLChart />
           </div>
         </div>
