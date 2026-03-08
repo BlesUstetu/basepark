@@ -5,24 +5,24 @@ export default function NeonTitle(){
 
 return(
 
-<h1 className="title">
+  <h1 className="title">
 
-{text.map((letter,i)=>(
+    {text.map((letter,i)=>(
 
-<span
-key={i}
-className="neon-letter"
-style={{animationDelay:`${i*0.15}s`}}
->
+      <span
+        key={i}
+        className="neon-letter"
+        style={{animationDelay:`${i*0.15}s`}}
+      >
 
-{letter}
+        {letter}
 
-</span>
+      </span>
 
-))}
+    ))}
 
-</h1>
+   </h1>
 
-)
+ )
 
 }
