@@ -1,58 +1,64 @@
-import React from 'react';
-import { useEffect, useState } from "react"
-import { ConnectButton } from "@rainbow-me/rainbowkit"
+import React, { useEffect, useState } from "react";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { useReadContract, useAccount } from "wagmi";
+import NeonTitle from "./components/NeonTitle";
+import VaultCard from "./components/VaultCard";
+import TVLChart from "./components/TVLChart";
 
-// --- TAMBAHKAN INI (ID DARI REMIX) ---
-const CONTRACT_ADDRESS = "0xd2f9411079a3362d3e20cef1719cf2d8a3923d8d"; 
-const CONTRACT_ABI = [ 
-  // Paste ABI (JSON) yang kamu copy dari Remix di sini
-];
-// -------------------------------------
+// KONEKSI SMART CONTRACT DARI REMIX
+const CONTRACT_ADDRESS = "0xd2f9411079a3362d3e20cef1719cf2d8a3923d8d"; // <--- GANTI INI
+const CONTRACT_ABI = [ /* PASTE ABI DARI REMIX DISINI */ ];
 
-import NeonTitle from "./components/NeonTitle"
-import VaultCard from "./components/VaultCard"
-import TVLChart from "./components/TVLChart"
+export default function App() {
+  const { isConnected } = useAccount();
+  const [tvlData, setTvlData] = useState([]);
 
-// Import hook dari Wagmi untuk interaksi kontrak
-import { useReadContract } from 'wagmi' 
-
-export default function App(){
-  const [tvlData, setTvlData] = useState([])
-
-  // Contoh mengambil data saldo dari Smart Contract (ID Remix)
-  const { data: balance } = useReadContract({
+  // Membaca total saldo dari Smart Contract
+  const { data: totalAssets } = useReadContract({
     address: CONTRACT_ADDRESS,
     abi: CONTRACT_ABI,
-    functionName: 'totalAssets', // Ganti dengan nama fungsi di contract kamu
-  })
+    functionName: "totalAssets", 
+  });
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setTvlData(data => [
-        ...data,
+      setTvlData((prev) => [
+        ...prev.slice(-15),
         {
-          time: new Date().toLocaleTimeString(),
-          // Gunakan data asli dari contract jika ada, atau random untuk simulasi
-          tvl: balance ? Number(balance) : Math.random() * 100 
-        }
-      ].slice(-10)) // Batasi agar grafik tidak terlalu penuh
-    }, 5000)
-
-    return () => clearInterval(interval)
-  }, [balance])
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          tvl: totalAssets ? Number(totalAssets) / 1e18 : Math.random() * 100,
+        },
+      ]);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [totalAssets]);
 
   return (
-    <div className="container">
-      <NeonTitle/>
-      
-      <div className="wallet">
-        <ConnectButton />
-      </div>
+    <div className="app-shell">
+      <nav className="navbar">
+        <div className="logo">BASEPARK<span>VAULT</span></div>
+        <ConnectButton showBalance={false} chainStatus="icon" />
+      </nav>
 
-      {/* Kamu bisa oper CONTRACT_ADDRESS ke VaultCard jika perlu */}
-      <VaultCard contractAddress={CONTRACT_ADDRESS} abi={CONTRACT_ABI} />
+      <main className="container">
+        <header className="hero">
+          <NeonTitle />
+          <p className="subtitle">Secure your assets in the premier vault on Base Network</p>
+        </header>
 
-      <TVLChart data={tvlData}/>
+        <div className="dashboard-grid">
+          <div className="card-section">
+            <VaultCard address={CONTRACT_ADDRESS} abi={CONTRACT_ABI} />
+          </div>
+          
+          <div className="chart-section">
+            <div className="glass-card">
+              <h3>Vault Performance (TVL)</h3>
+              <TVLChart data={tvlData} />
+            </div>
+          </div>
+        </div>
+      </main>
     </div>
-  )
+  );
 }
