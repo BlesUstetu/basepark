@@ -15,18 +15,21 @@ const queryClient = new QueryClient()
 
 const config = getDefaultConfig({
   appName: "BaseParkVault",
-  projectId: "0xd2f9411079a3362d3e20cef1719cf2d8a3923d8d",
+  // CATATAN: Pastikan ini adalah Project ID dari WalletConnect Cloud (bukan address dompet)
+  projectId: "0xd2f9411079a3362d3e20cef1719cf2d8a3923d8d", 
   chains: [base],
+  ssr: true, // Tambahkan ini jika kamu berencana menggunakan Next.js nantinya
 })
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <WagmiProvider config={config}>
-        <RainbowKitProvider chains={[base]}>
+    <WagmiProvider config={config}>
+      <QueryClientProvider client={queryClient}>
+        <RainbowKitProvider> 
+          {/* Prop chains={[base]} di atas sudah dihapus karena sudah ada di config */}
           <App />
         </RainbowKitProvider>
-      </WagmiProvider>
-    </QueryClientProvider>
+      </QueryClientProvider>
+    </WagmiProvider>
   </React.StrictMode>
 )
