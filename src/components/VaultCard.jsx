@@ -13,6 +13,11 @@ const [loading,setLoading] = useState(false)
 const CONTRACT_ADDRESS = CONTRACTS.BaseParkVault.address
 const CONTRACT_ABI = CONTRACTS.BaseParkVault.abi
 
+const FEE_BPS = 200
+
+const feePreview = amount ? (Number(amount) * FEE_BPS) / 10000 : 0
+const netDeposit = amount ? Number(amount) - feePreview : 0
+
 
 async function loadData(){
 
@@ -25,11 +30,9 @@ const signer = await provider.getSigner()
 const user = await signer.getAddress()
 
 const contract = new ethers.Contract(
-
 CONTRACT_ADDRESS,
 CONTRACT_ABI,
 provider
-
 )
 
 const balance = await provider.getBalance(CONTRACT_ADDRESS)
@@ -49,7 +52,6 @@ console.log(err)
 }
 
 
-
 useEffect(()=>{
 
 loadData()
@@ -67,8 +69,17 @@ async function deposit(){
 setError("")
 
 if(!amount){
-setError("Enter amount")
+
+setError("Enter deposit amount")
+
 return
+
+}
+
+if(!confirm(`Deposit ${amount} ETH?\nFee: ${feePreview.toFixed(6)} ETH\nNet: ${netDeposit.toFixed(6)} ETH`)){
+
+return
+
 }
 
 try{
@@ -80,17 +91,13 @@ const provider = new ethers.BrowserProvider(window.ethereum)
 const signer = await provider.getSigner()
 
 const contract = new ethers.Contract(
-
 CONTRACT_ADDRESS,
 CONTRACT_ABI,
 signer
-
 )
 
 const tx = await contract.deposit({
-
 value: ethers.parseEther(amount)
-
 })
 
 await tx.wait()
@@ -101,7 +108,7 @@ loadData()
 
 }catch(err){
 
-setError(err.reason || err.shortMessage || "Transaction failed")
+setError(err.reason || err.shortMessage || "Deposit failed")
 
 }
 
@@ -116,13 +123,25 @@ async function withdraw(){
 setError("")
 
 if(!amount){
-setError("Enter amount")
+
+setError("Enter withdraw amount")
+
 return
+
 }
 
 if(Number(amount) > Number(userBalance)){
+
 setError("Withdraw exceeds vault balance")
+
 return
+
+}
+
+if(!confirm(`Withdraw ${amount} ETH from vault?`)){
+
+return
+
 }
 
 try{
@@ -134,17 +153,13 @@ const provider = new ethers.BrowserProvider(window.ethereum)
 const signer = await provider.getSigner()
 
 const contract = new ethers.Contract(
-
 CONTRACT_ADDRESS,
 CONTRACT_ABI,
 signer
-
 )
 
 const tx = await contract.withdraw(
-
 ethers.parseEther(amount)
-
 )
 
 await tx.wait()
@@ -165,7 +180,7 @@ setLoading(false)
 
 
 
-function setMax(){
+function setMaxWithdraw(){
 
 setAmount(userBalance)
 
@@ -184,7 +199,7 @@ return(
 
 <span>Total Value Locked</span>
 
-<strong>{Number(tvl).toFixed(4)} ETH</strong>
+<strong>{Number(tvl).toFixed(6)} ETH</strong>
 
 </div>
 
@@ -193,27 +208,35 @@ return(
 
 <span>Your Vault Balance</span>
 
-<strong>{Number(userBalance).toFixed(4)} ETH</strong>
+<strong>{Number(userBalance).toFixed(6)} ETH</strong>
 
 </div>
 
 
 <input
-
 type="number"
-
 placeholder="0.0 ETH"
-
 value={amount}
-
 onChange={(e)=>setAmount(e.target.value)}
-
 />
 
 
-<button className="max-btn" onClick={setMax}>
+<button className="max-btn" onClick={setMaxWithdraw}>
 MAX
 </button>
+
+
+{amount && (
+
+<div className="preview">
+
+<p>Deposit Fee (2%): {feePreview.toFixed(6)} ETH</p>
+
+<p>Net Deposit: {netDeposit.toFixed(6)} ETH</p>
+
+</div>
+
+)}
 
 
 <div className="buttons">
@@ -232,9 +255,7 @@ MAX
 {error && (
 
 <p className="error">
-
 {error}
-
 </p>
 
 )}
