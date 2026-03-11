@@ -83,32 +83,40 @@ setTimeout(()=>loadData(retry+1),2000)
 
 useEffect(()=>{
 
-detectWallet()
-
-},[])
-
-useEffect(()=>{
-
 loadData()
 
-const interval=setInterval(loadData,15000)
+const interval = setInterval(loadData,15000)
+
+let handleAccounts
+let handleChain
 
 if(window.ethereum){
 
-window.ethereum.on("accountsChanged",(acc)=>{
+handleAccounts = (acc)=>{
+setWallet(acc[0] || null)
+}
 
-setWallet(acc[0]||null)
+handleChain = ()=>{
+loadData()
+}
 
-})
-
-window.ethereum.on("chainChanged",loadData)
+window.ethereum.on("accountsChanged", handleAccounts)
+window.ethereum.on("chainChanged", handleChain)
 
 }
 
-return ()=>clearInterval(interval)
+return ()=>{
 
-},[wallet])
+clearInterval(interval)
 
+if(window.ethereum){
+window.ethereum.removeListener("accountsChanged", handleAccounts)
+window.ethereum.removeListener("chainChanged", handleChain)
+}
+
+}
+
+},[])   // ✅ hanya dijalankan sekali
 
 /* ---------------- PREVIEW ---------------- */
 
