@@ -15,11 +15,19 @@ const CONTRACT_ABI = CONTRACTS.BaseParkVault.abi
 
 const FEE_BPS = 200
 
-const feePreview = amount ? (Number(amount) * FEE_BPS) / 10000 : 0
-const netDeposit = amount ? Number(amount) - feePreview : 0
+
+const feePreview = amount
+ ? (Number(amount) * FEE_BPS) / 10000
+ : 0
+
+const netDeposit = amount
+ ? Number(amount) - feePreview
+ : 0
 
 
 async function loadData(){
+
+if(typeof window === "undefined") return
 
 try{
 
@@ -35,11 +43,11 @@ CONTRACT_ABI,
 provider
 )
 
-const balance = await provider.getBalance(CONTRACT_ADDRESS)
+const vaultBalance = await provider.getBalance(CONTRACT_ADDRESS)
 
 const userBal = await contract.balances(user)
 
-setTvl(ethers.formatEther(balance))
+setTvl(ethers.formatEther(vaultBalance))
 
 setUserBalance(ethers.formatEther(userBal))
 
@@ -50,6 +58,7 @@ console.log(err)
 }
 
 }
+
 
 
 useEffect(()=>{
@@ -69,19 +78,16 @@ async function deposit(){
 setError("")
 
 if(!amount){
-
 setError("Enter deposit amount")
-
 return
-
 }
 
 if(typeof window !== "undefined"){
- if(!window.confirm(`Withdraw ${amount} ETH?`)){
-  return
- }
-}
+const ok = window.confirm(
+`Deposit ${amount} ETH?\nFee: ${feePreview.toFixed(6)} ETH`
+)
 
+if(!ok) return
 }
 
 try{
@@ -106,7 +112,7 @@ await tx.wait()
 
 setAmount("")
 
-loadData()
+await loadData()
 
 }catch(err){
 
@@ -125,25 +131,21 @@ async function withdraw(){
 setError("")
 
 if(!amount){
-
 setError("Enter withdraw amount")
-
 return
-
 }
 
 if(Number(amount) > Number(userBalance)){
-
 setError("Withdraw exceeds vault balance")
-
 return
-
 }
 
-if(!confirm(`Withdraw ${amount} ETH from vault?`)){
+if(typeof window !== "undefined"){
+const ok = window.confirm(
+`Withdraw ${amount} ETH from vault?`
+)
 
-return
-
+if(!ok) return
 }
 
 try{
@@ -168,7 +170,7 @@ await tx.wait()
 
 setAmount("")
 
-loadData()
+await loadData()
 
 }catch(err){
 
@@ -183,9 +185,7 @@ setLoading(false)
 
 
 function setMaxWithdraw(){
-
 setAmount(userBalance)
-
 }
 
 
@@ -198,20 +198,14 @@ return(
 
 
 <div className="stat">
-
 <span>Total Value Locked</span>
-
 <strong>{Number(tvl).toFixed(6)} ETH</strong>
-
 </div>
 
 
 <div className="stat">
-
 <span>Your Vault Balance</span>
-
 <strong>{Number(userBalance).toFixed(6)} ETH</strong>
-
 </div>
 
 
@@ -232,7 +226,7 @@ MAX
 
 <div className="preview">
 
-<p>Deposit Fee (2%): {feePreview.toFixed(6)} ETH</p>
+<p>Fee (2%): {feePreview.toFixed(6)} ETH</p>
 
 <p>Net Deposit: {netDeposit.toFixed(6)} ETH</p>
 
