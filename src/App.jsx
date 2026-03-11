@@ -13,10 +13,6 @@ return(
 
 <div className="container">
 
-<h1 className="title">
-BasePark Vault
-</h1>
-
 <p className="subtitle">
 Brankas Aman dengan Hasil Tinggi di Jaringan Base
 </p>
