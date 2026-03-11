@@ -7,8 +7,9 @@ export default function VaultCard(){
 const [amount,setAmount] = useState("")
 const [tvl,setTvl] = useState("0")
 const [userBalance,setUserBalance] = useState("0")
-const [error,setError] = useState("")
+const [wallet,setWallet] = useState(null)
 const [loading,setLoading] = useState(false)
+const [error,setError] = useState("")
 
 const CONTRACT_ADDRESS = CONTRACTS.BaseParkVault.address
 const CONTRACT_ABI = CONTRACTS.BaseParkVault.abi
@@ -16,26 +17,34 @@ const CONTRACT_ABI = CONTRACTS.BaseParkVault.abi
 const FEE_BPS = 200
 
 
-const feePreview = amount
- ? (Number(amount) * FEE_BPS) / 10000
- : 0
+/* ---------------- CONNECT WALLET ---------------- */
 
-const netDeposit = amount
- ? Number(amount) - feePreview
- : 0
+async function detectWallet(){
 
-
-async function loadData(){
-
-if(typeof window === "undefined") return
-
-try{
+if(!window.ethereum) return
 
 const provider = new ethers.BrowserProvider(window.ethereum)
 
-const signer = await provider.getSigner()
+const accounts = await provider.send("eth_accounts",[])
 
-const user = await signer.getAddress()
+if(accounts.length>0){
+
+setWallet(accounts[0])
+
+}
+
+}
+
+
+/* ---------------- LOAD DATA ---------------- */
+
+async function loadData(retry=0){
+
+try{
+
+if(!window.ethereum) return
+
+const provider = new ethers.BrowserProvider(window.ethereum)
 
 const contract = new ethers.Contract(
 CONTRACT_ADDRESS,
@@ -45,49 +54,93 @@ provider
 
 const vaultBalance = await provider.getBalance(CONTRACT_ADDRESS)
 
-const userBal = await contract.balances(user)
-
 setTvl(ethers.formatEther(vaultBalance))
+
+if(wallet){
+
+const userBal = await contract.balances(wallet)
 
 setUserBalance(ethers.formatEther(userBal))
 
+}
+
 }catch(err){
 
-console.log(err)
+console.log("RPC error",err)
+
+if(retry<3){
+
+setTimeout(()=>loadData(retry+1),2000)
 
 }
 
 }
 
+}
 
+
+/* ---------------- INIT ---------------- */
+
+useEffect(()=>{
+
+detectWallet()
+
+},[])
 
 useEffect(()=>{
 
 loadData()
 
-const interval = setInterval(loadData,10000)
+const interval=setInterval(loadData,15000)
+
+if(window.ethereum){
+
+window.ethereum.on("accountsChanged",(acc)=>{
+
+setWallet(acc[0]||null)
+
+})
+
+window.ethereum.on("chainChanged",loadData)
+
+}
 
 return ()=>clearInterval(interval)
 
-},[])
+},[wallet])
 
 
+/* ---------------- PREVIEW ---------------- */
+
+const feePreview = amount
+? (Number(amount)*FEE_BPS)/10000
+:0
+
+const netDeposit = amount
+? Number(amount)-feePreview
+:0
+
+
+/* ---------------- DEPOSIT ---------------- */
 
 async function deposit(){
 
 setError("")
 
-if(!amount){
-setError("Enter deposit amount")
+if(!wallet){
+
+setError("Connect wallet first")
+
 return
+
 }
 
-if(typeof window !== "undefined"){
-const ok = window.confirm(
-`Deposit ${amount} ETH?\nFee: ${feePreview.toFixed(6)} ETH`
-)
+if(!amount){
 
-if(!ok) return
+setError("Enter deposit amount")
+
+return
+
 }
 
 try{
@@ -112,7 +165,7 @@ await tx.wait()
 
 setAmount("")
 
-await loadData()
+loadData()
 
 }catch(err){
 
@@ -125,27 +178,34 @@ setLoading(false)
 }
 
 
+/* ---------------- WITHDRAW ---------------- */
 
 async function withdraw(){
 
 setError("")
 
+if(!wallet){
+
+setError("Connect wallet first")
+
+return
+
+}
+
 if(!amount){
+
 setError("Enter withdraw amount")
+
 return
+
 }
 
-if(Number(amount) > Number(userBalance)){
+if(Number(amount)>Number(userBalance)){
+
 setError("Withdraw exceeds vault balance")
+
 return
-}
 
-if(typeof window !== "undefined"){
-const ok = window.confirm(
-`Withdraw ${amount} ETH from vault?`
-)
-
-if(!ok) return
 }
 
 try{
@@ -170,7 +230,7 @@ await tx.wait()
 
 setAmount("")
 
-await loadData()
+loadData()
 
 }catch(err){
 
@@ -183,31 +243,32 @@ setLoading(false)
 }
 
 
+/* ---------------- MAX BUTTON ---------------- */
 
-function setMaxWithdraw(){
+function setMax(){
+
 setAmount(userBalance)
+
 }
 
 
+/* ---------------- UI ---------------- */
 
 return(
 
 <div className="neon-card">
 
-<h2>Vault Interface</h2>
-
+<h2>Antarmuka Brankas</h2>
 
 <div className="stat">
-<span>Total Value Locked</span>
+<span>Total Nilai Terkunci</span>
 <strong>{Number(tvl).toFixed(6)} ETH</strong>
 </div>
 
-
 <div className="stat">
-<span>Your Vault Balance</span>
+<span>Saldo Brankas Anda</span>
 <strong>{Number(userBalance).toFixed(6)} ETH</strong>
 </div>
-
 
 <input
 type="number"
@@ -216,37 +277,33 @@ value={amount}
 onChange={(e)=>setAmount(e.target.value)}
 />
 
-
-<button className="max-btn" onClick={setMaxWithdraw}>
-MAX
+<button className="max-btn" onClick={setMax}>
+MAKS
 </button>
-
 
 {amount && (
 
 <div className="preview">
 
-<p>Fee (2%): {feePreview.toFixed(6)} ETH</p>
+<p>Biaya (2%): {feePreview.toFixed(6)} ETH</p>
 
-<p>Net Deposit: {netDeposit.toFixed(6)} ETH</p>
+<p>Setoran Bersih: {netDeposit.toFixed(6)} ETH</p>
 
 </div>
 
 )}
 
-
 <div className="buttons">
 
 <button onClick={deposit} disabled={loading}>
-{loading ? "Processing..." : "Deposit"}
+{loading ? "Memproses..." : "Setoran"}
 </button>
 
 <button onClick={withdraw} disabled={loading}>
-{loading ? "Processing..." : "Withdraw"}
+{loading ? "Memproses..." : "Penarikan"}
 </button>
 
 </div>
-
 
 {error && (
 
