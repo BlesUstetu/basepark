@@ -116,6 +116,28 @@ border-radius:6px;
 cursor:pointer;
 }
 
+.max-btn{
+margin-top:6px;
+background:#1f1f2e;
+color:#00ffd5;
+border:none;
+padding:6px 12px;
+border-radius:6px;
+cursor:pointer;
+}
+
+.preview{
+margin-top:10px;
+font-size:14px;
+color:#aaa;
+}
+
+.error{
+margin-top:10px;
+color:#ff4d4f;
+font-size:14px;
+}
+
 .error{
 margin-top:10px;
 color:#ff4d4f;
