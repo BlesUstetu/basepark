@@ -1,72 +1,106 @@
-import { useState,useEffect } from "react"
+import { useState, useEffect } from "react"
 import { ethers } from "ethers"
-
-const CONTRACT="0x2Cf04195c4725C7C2dD617ef373B8b17a4de6519"
+import { CONTRACTS } from "../config/contracts"
 
 export default function VaultCard(){
 
-const [amount,setAmount]=useState("")
-const [tvl,setTvl]=useState(0)
+const [amount,setAmount] = useState("")
+const [tvl,setTvl] = useState("0")
+
+const CONTRACT_ADDRESS = CONTRACTS.BaseParkVault.address
+const CONTRACT_ABI = CONTRACTS.BaseParkVault.abi
+
 
 async function loadTVL(){
 
-const provider=new ethers.BrowserProvider(window.ethereum)
+try{
 
-const balance=await provider.getBalance(CONTRACT)
+const provider = new ethers.BrowserProvider(window.ethereum)
+
+const balance = await provider.getBalance(CONTRACT_ADDRESS)
 
 setTvl(ethers.formatEther(balance))
 
+}catch(err){
+
+console.log("TVL error:",err)
+
 }
+
+}
+
 
 useEffect(()=>{
 
 loadTVL()
 
-setInterval(loadTVL,10000)
+const interval = setInterval(loadTVL,10000)
+
+return ()=>clearInterval(interval)
 
 },[])
 
+
+
 async function deposit(){
 
-const provider=new ethers.BrowserProvider(window.ethereum)
+if(!amount) return
 
-const signer=await provider.getSigner()
+try{
 
-const contract=new ethers.Contract(
+const provider = new ethers.BrowserProvider(window.ethereum)
 
-CONTRACT,
-["function deposit() payable"],
+const signer = await provider.getSigner()
+
+const contract = new ethers.Contract(
+
+CONTRACT_ADDRESS,
+CONTRACT_ABI,
 signer
 
 )
 
-const tx=await contract.deposit({
+const tx = await contract.deposit({
 
-value:ethers.parseEther(amount)
+value: ethers.parseEther(amount)
 
 })
 
 await tx.wait()
 
+setAmount("")
+
 loadTVL()
+
+}catch(err){
+
+console.log("Deposit error:",err)
 
 }
 
+}
+
+
+
 async function withdraw(){
 
-const provider=new ethers.BrowserProvider(window.ethereum)
+if(!amount) return
 
-const signer=await provider.getSigner()
+try{
 
-const contract=new ethers.Contract(
+const provider = new ethers.BrowserProvider(window.ethereum)
 
-CONTRACT,
-["function withdraw(uint amount)"],
+const signer = await provider.getSigner()
+
+const contract = new ethers.Contract(
+
+CONTRACT_ADDRESS,
+CONTRACT_ABI,
 signer
 
 )
 
-const tx=await contract.withdraw(
+const tx = await contract.withdraw(
 
 ethers.parseEther(amount)
 
@@ -74,29 +108,39 @@ ethers.parseEther(amount)
 
 await tx.wait()
 
+setAmount("")
+
 loadTVL()
 
+}catch(err){
+
+console.log("Withdraw error:",err)
+
 }
+
+}
+
+
 
 return(
 
 <div className="neon-card">
 
-<h2>Antarmuka Brankas</h2>
+<h2>Vault Interface</h2>
 
 <div className="stat">
 
-TVL
+<span>Total Value Locked</span>
 
-<span>{tvl} ETH</span>
+<strong>{tvl} ETH</strong>
 
 </div>
 
 <div className="stat">
 
-APY
+<span>APY</span>
 
-<span>12.4%</span>
+<strong>12.4%</strong>
 
 </div>
 
@@ -104,7 +148,7 @@ APY
 
 type="number"
 
-placeholder="0.0"
+placeholder="0.0 ETH"
 
 value={amount}
 
