@@ -76,9 +76,11 @@ return
 
 }
 
-if(!confirm(`Deposit ${amount} ETH?\nFee: ${feePreview.toFixed(6)} ETH\nNet: ${netDeposit.toFixed(6)} ETH`)){
-
-return
+if(typeof window !== "undefined"){
+ if(!window.confirm(`Withdraw ${amount} ETH?`)){
+  return
+ }
+}
 
 }
 
