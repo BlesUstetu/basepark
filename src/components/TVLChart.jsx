@@ -1,15 +1,13 @@
 import { useEffect, useState } from "react"
 import { ethers } from "ethers"
 import {
-LineChart,
-Line,
+AreaChart,
+Area,
 XAxis,
 YAxis,
 Tooltip,
 ResponsiveContainer,
-CartesianGrid,
-Area,
-AreaChart
+CartesianGrid
 } from "recharts"
 
 import { CONTRACTS } from "../../config/contracts"
@@ -20,18 +18,21 @@ const [data,setData] = useState([])
 const [tvl,setTvl] = useState(0)
 
 const CONTRACT_ADDRESS = CONTRACTS.BaseParkVault.address
+const CONTRACT_ABI = CONTRACTS.BaseParkVault.abi
 
-async function loadTVL(){
-
-if(!window.ethereum) return
+async function loadTVL(provider){
 
 try{
 
-const provider = new ethers.BrowserProvider(window.ethereum)
+const contract = new ethers.Contract(
+CONTRACT_ADDRESS,
+CONTRACT_ABI,
+provider
+)
 
-const balance = await provider.getBalance(CONTRACT_ADDRESS)
+const assets = await contract.totalAssets()
 
-const tvlValue = Number(ethers.formatEther(balance))
+const tvlValue = Number(ethers.formatEther(assets))
 
 const time = new Date().toLocaleTimeString([],{
 hour:"2-digit",
@@ -54,7 +55,7 @@ return updated
 
 }catch(err){
 
-console.log("TVL error",err)
+console.log("TVL error:",err)
 
 }
 
@@ -62,11 +63,33 @@ console.log("TVL error",err)
 
 useEffect(()=>{
 
-loadTVL()
+if(!window.ethereum) return
 
-const interval=setInterval(loadTVL,15000)
+const provider = new ethers.BrowserProvider(window.ethereum)
 
-return()=>clearInterval(interval)
+const contract = new ethers.Contract(
+CONTRACT_ADDRESS,
+CONTRACT_ABI,
+provider
+)
+
+/* load pertama */
+
+loadTVL(provider)
+
+/* realtime events */
+
+contract.on("Deposit", ()=> loadTVL(provider))
+
+contract.on("Withdraw", ()=> loadTVL(provider))
+
+contract.on("EmergencyWithdraw", ()=> loadTVL(provider))
+
+return ()=>{
+
+contract.removeAllListeners()
+
+}
 
 },[])
 
