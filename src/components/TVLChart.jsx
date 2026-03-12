@@ -6,8 +6,7 @@ Area,
 XAxis,
 YAxis,
 Tooltip,
-ResponsiveContainer,
-CartesianGrid
+ResponsiveContainer
 } from "recharts"
 
 import { CONTRACTS } from "../../config/contracts"
@@ -18,21 +17,18 @@ const [data,setData] = useState([])
 const [tvl,setTvl] = useState(0)
 
 const CONTRACT_ADDRESS = CONTRACTS.BaseParkVault.address
-const CONTRACT_ABI = CONTRACTS.BaseParkVault.abi
 
-async function loadTVL(provider){
+async function loadTVL(){
+
+if(!window.ethereum) return
 
 try{
 
-const contract = new ethers.Contract(
-CONTRACT_ADDRESS,
-CONTRACT_ABI,
-provider
-)
+const provider = new ethers.BrowserProvider(window.ethereum)
 
-const assets = await contract.totalAssets()
+const balance = await provider.getBalance(CONTRACT_ADDRESS)
 
-const tvlValue = Number(ethers.formatEther(assets))
+const tvlValue = Number(ethers.formatEther(balance))
 
 const time = new Date().toLocaleTimeString([],{
 hour:"2-digit",
@@ -63,33 +59,11 @@ console.log("TVL error:",err)
 
 useEffect(()=>{
 
-if(!window.ethereum) return
+loadTVL()
 
-const provider = new ethers.BrowserProvider(window.ethereum)
+const interval=setInterval(loadTVL,5000)
 
-const contract = new ethers.Contract(
-CONTRACT_ADDRESS,
-CONTRACT_ABI,
-provider
-)
-
-/* load pertama */
-
-loadTVL(provider)
-
-/* realtime events */
-
-contract.on("Deposit", ()=> loadTVL(provider))
-
-contract.on("Withdraw", ()=> loadTVL(provider))
-
-contract.on("EmergencyWithdraw", ()=> loadTVL(provider))
-
-return ()=>{
-
-contract.removeAllListeners()
-
-}
+return()=>clearInterval(interval)
 
 },[])
 
@@ -109,39 +83,19 @@ return(
 
 <AreaChart data={data}>
 
-<defs>
+<XAxis dataKey="time"/>
 
-<linearGradient id="tvlGradient" x1="0" y1="0" x2="0" y2="1">
+<YAxis/>
 
-<stop offset="5%" stopColor="#00ffd5" stopOpacity={0.8}/>
-
-<stop offset="95%" stopColor="#00ffd5" stopOpacity={0}/>
-
-</linearGradient>
-
-</defs>
-
-<CartesianGrid stroke="#1c1c35" strokeDasharray="3 3"/>
-
-<XAxis dataKey="time" stroke="#8a8aa3"/>
-
-<YAxis stroke="#8a8aa3"/>
-
-<Tooltip
-contentStyle={{
-background:"#0b0b18",
-border:"1px solid #1c1c35",
-borderRadius:"8px"
-}}
-/>
+<Tooltip/>
 
 <Area
 type="monotone"
 dataKey="tvl"
 stroke="#00ffd5"
 strokeWidth={3}
-fillOpacity={1}
-fill="url(#tvlGradient)"
+fillOpacity={0.3}
+fill="#00ffd5"
 dot={false}
 />
 
