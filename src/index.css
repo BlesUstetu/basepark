@@ -304,3 +304,18 @@ padding:16px 18px;
 }
 
 }
+
+.tx small{
+color:#8a8aa3;
+font-size:12px;
+}
+
+.tx a{
+font-size:11px;
+color:#00ffd5;
+text-decoration:none;
+}
+
+.tx a:hover{
+text-decoration:underline;
+}
