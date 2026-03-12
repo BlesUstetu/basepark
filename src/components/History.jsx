@@ -9,6 +9,17 @@ const [history,setHistory] = useState([])
 const CONTRACT_ADDRESS = CONTRACTS.BaseParkVault.address
 const CONTRACT_ABI = CONTRACTS.BaseParkVault.abi
 
+/* ambil waktu dari block */
+
+async function getTimestamp(provider, blockNumber){
+
+const block = await provider.getBlock(blockNumber)
+
+return new Date(block.timestamp * 1000).toLocaleString()
+
+}
+
+/* load history */
 
 async function loadHistory(){
 
@@ -24,7 +35,7 @@ CONTRACT_ABI,
 provider
 )
 
-/* ambil event */
+/* ambil events */
 
 const depositEvents = await contract.queryFilter(
 contract.filters.Deposit(),
@@ -46,34 +57,63 @@ contract.filters.EmergencyWithdraw(),
 
 /* format data */
 
-const deposits = depositEvents.map(tx=>({
+const deposits = await Promise.all(
+depositEvents.map(async tx => ({
+
 type:"Deposit",
-amount:ethers.formatEther(tx.args.amount),
-hash:tx.transactionHash
-}))
 
-const withdraws = withdrawEvents.map(tx=>({
+amount:ethers.formatEther(tx.args.amount),
+
+hash:tx.transactionHash,
+
+time:await getTimestamp(provider,tx.blockNumber)
+
+}))
+)
+
+const withdraws = await Promise.all(
+withdrawEvents.map(async tx => ({
+
 type:"Withdraw",
-amount:ethers.formatEther(tx.args.amount),
-hash:tx.transactionHash
-}))
 
-const emergencies = emergencyEvents.map(tx=>({
+amount:ethers.formatEther(tx.args.amount),
+
+hash:tx.transactionHash,
+
+time:await getTimestamp(provider,tx.blockNumber)
+
+}))
+)
+
+const emergencies = await Promise.all(
+emergencyEvents.map(async tx => ({
+
 type:"Emergency",
-amount:ethers.formatEther(tx.args.amount),
-hash:tx.transactionHash
-}))
 
-setHistory([...deposits,...withdraws,...emergencies])
+amount:ethers.formatEther(tx.args.amount),
+
+hash:tx.transactionHash,
+
+time:await getTimestamp(provider,tx.blockNumber)
+
+}))
+)
+
+/* gabungkan dan urutkan terbaru */
+
+const allTx = [...deposits,...withdraws,...emergencies]
+
+allTx.sort((a,b)=> b.time.localeCompare(a.time))
+
+setHistory(allTx)
 
 }catch(err){
 
-console.log("History error",err)
+console.log("History load error:",err)
 
 }
 
 }
-
 
 useEffect(()=>{
 
@@ -89,18 +129,40 @@ return(
 <h2>Riwayat Transaksi</h2>
 
 {history.length===0 && (
-
 <p>Belum ada transaksi.</p>
-
 )}
 
 {history.map((tx,i)=>(
 
 <div className="tx" key={i}>
 
+<div>
+
 <span>{tx.type}</span>
 
-<span>{Number(tx.amount).toFixed(6)} ETH</span>
+<br/>
+
+<small>{tx.time}</small>
+
+<br/>
+
+<a
+href={`https://basescan.org/tx/${tx.hash}`}
+target="_blank"
+rel="noreferrer"
+>
+
+Lihat Tx
+
+</a>
+
+</div>
+
+<span>
+
+{Number(tx.amount).toFixed(6)} ETH
+
+</span>
 
 </div>
 
