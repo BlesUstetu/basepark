@@ -93,6 +93,7 @@ transition:all .35s ease;
 
 .neon-card:before{
 content:"";
+pointer-events:none;
 position:absolute;
 inset:0;
 border-radius:16px;
@@ -141,6 +142,8 @@ background:#0f0f22;
 color:white;
 font-size:15px;
 transition:.25s;
+position:relative;
+z-index:2;
 }
 
 input:focus{
