@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import { ethers } from "ethers"
+
 import {
 AreaChart,
 Area,
@@ -10,7 +11,7 @@ ResponsiveContainer,
 CartesianGrid
 } from "recharts"
 
-import { CONTRACTS } from "../../config/contracts"
+import { CONTRACTS } from "../config/contracts"
 
 export default function TVLChart(){
 
@@ -79,11 +80,9 @@ loadTVL(provider)
 
 /* realtime update */
 
-contract.on("Deposit", ()=> loadTVL(provider))
-
-contract.on("Withdraw", ()=> loadTVL(provider))
-
-contract.on("EmergencyWithdraw", ()=> loadTVL(provider))
+contract.on("Deposit",()=>loadTVL(provider))
+contract.on("Withdraw",()=>loadTVL(provider))
+contract.on("EmergencyWithdraw",()=>loadTVL(provider))
 
 return ()=>{
 
@@ -109,18 +108,6 @@ return(
 
 <AreaChart data={data}>
 
-<defs>
-
-<linearGradient id="tvlGradient" x1="0" y1="0" x2="0" y2="1">
-
-<stop offset="5%" stopColor="#00ffd5" stopOpacity={0.8}/>
-
-<stop offset="95%" stopColor="#00ffd5" stopOpacity={0}/>
-
-</linearGradient>
-
-</defs>
-
 <CartesianGrid stroke="#1c1c35" strokeDasharray="3 3"/>
 
 <XAxis dataKey="time" stroke="#8a8aa3"/>
@@ -141,8 +128,8 @@ type="monotone"
 dataKey="tvl"
 stroke="#00ffd5"
 strokeWidth={3}
-fillOpacity={1}
-fill="url(#tvlGradient)"
+fillOpacity={0.3}
+fill="#00ffd5"
 dot={false}
 />
 
