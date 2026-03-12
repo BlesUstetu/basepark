@@ -9,7 +9,6 @@ background:
 radial-gradient(circle at 20% 20%,#0b0b2a 0%,#050510 40%),
 #050510;
 color:white;
--webkit-font-smoothing:antialiased;
 }
 
 /* ============================= */
@@ -71,12 +70,12 @@ margin-bottom:50px;
 .dashboard{
 display:grid;
 grid-template-columns:1fr 1fr;
-gap:32px;
-margin-bottom:45px;
+gap:30px;
+margin-bottom:40px;
 }
 
 /* ============================= */
-/* CARD STYLE */
+/* CARD */
 /* ============================= */
 
 .neon-card{
@@ -89,11 +88,10 @@ overflow:hidden;
 transition:all .35s ease;
 }
 
-/* neon glow border */
+/* neon border */
 
 .neon-card:before{
 content:"";
-pointer-events:none;
 position:absolute;
 inset:0;
 border-radius:16px;
@@ -105,15 +103,16 @@ linear-gradient(#000 0 0);
 -webkit-mask-composite:xor;
 mask-composite:exclude;
 opacity:.15;
+pointer-events:none;
 }
 
 /* hover effect */
 
 .neon-card:hover{
-transform:translateY(-6px) scale(1.01);
+transform:translateY(-5px);
 box-shadow:
 0 10px 30px rgba(0,255,213,.15),
-0 0 30px rgba(60,124,255,.15);
+0 0 25px rgba(60,124,255,.15);
 }
 
 /* ============================= */
@@ -176,7 +175,7 @@ position:relative;
 overflow:hidden;
 }
 
-/* animated glow */
+/* button shine */
 
 button:before{
 content:"";
@@ -244,18 +243,6 @@ font-size:14px;
 }
 
 /* ============================= */
-/* CHART */
-/* ============================= */
-
-.chart-container{
-position:relative;
-}
-
-.chart-container canvas{
-filter:drop-shadow(0 0 8px rgba(0,255,213,.5));
-}
-
-/* ============================= */
 /* HISTORY */
 /* ============================= */
 
@@ -263,21 +250,89 @@ filter:drop-shadow(0 0 8px rgba(0,255,213,.5));
 margin-top:60px;
 }
 
-.history h2{
-margin-bottom:22px;
-}
+/* transaction row */
 
 .tx{
 display:flex;
 justify-content:space-between;
-padding:14px;
-border-bottom:1px solid #1c1c35;
-color:#cfcfe8;
-transition:.2s;
+align-items:center;
+padding:16px 14px;
+border-bottom:1px solid #1f1f2e;
+transition:all .25s ease;
 }
 
 .tx:hover{
 background:#0e0e25;
+}
+
+/* timestamp */
+
+.tx small{
+display:block;
+color:#8a8aa3;
+font-size:12px;
+margin-top:2px;
+}
+
+/* amount */
+
+.tx span:last-child{
+font-weight:600;
+color:#cfcfe8;
+}
+
+/* basescan link */
+
+.tx a{
+display:inline-block;
+margin-top:2px;
+font-size:11px;
+color:#00ffd5;
+text-decoration:none;
+}
+
+.tx a:hover{
+text-decoration:underline;
+}
+
+/* ============================= */
+/* NEW TRANSACTION ANIMATION */
+/* ============================= */
+
+.new-tx{
+animation:newTxGlow 1.2s ease;
+}
+
+@keyframes newTxGlow{
+
+0%{
+background:rgba(0,255,213,0.18);
+}
+
+40%{
+background:rgba(0,255,213,0.12);
+}
+
+100%{
+background:transparent;
+}
+
+}
+
+/* ============================= */
+/* TRANSACTION TYPE COLORS */
+/* ============================= */
+
+.tx.deposit span:first-child{
+color:#00ffd5;
+}
+
+.tx.withdraw span:first-child{
+color:#ff8a8a;
+}
+
+.tx.emergency span:first-child{
+color:#ffaa33;
 }
 
 /* ============================= */
@@ -301,61 +356,6 @@ padding:30px 15px;
 
 .header{
 padding:16px 18px;
-}
-
-}
-
-.tx small{
-color:#8a8aa3;
-font-size:12px;
-}
-
-.tx a{
-font-size:11px;
-color:#00ffd5;
-text-decoration:none;
-}
-
-.tx a:hover{
-text-decoration:underline;
-}
-
-.tx{
-display:flex;
-justify-content:space-between;
-padding:14px;
-border-bottom:1px solid #1f1f2e;
-}
-
-.tx small{
-color:#8a8aa3;
-font-size:12px;
-}
-
-.tx a{
-font-size:11px;
-color:#00ffd5;
-text-decoration:none;
-}
-
-.tx a:hover{
-text-decoration:underline;
-}
-
-/* animasi transaksi baru */
-
-.new-tx{
-animation:newTxGlow 1.2s ease;
-}
-
-@keyframes newTxGlow{
-
-0%{
-background:rgba(0,255,213,0.15);
-}
-
-100%{
-background:transparent;
 }
 
 }
