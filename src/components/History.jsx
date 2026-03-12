@@ -5,6 +5,7 @@ import { CONTRACTS } from "../config/contracts"
 export default function History(){
 
 const [history,setHistory] = useState([])
+const [lastHash,setLastHash] = useState(null)
 
 const CONTRACT_ADDRESS = CONTRACTS.BaseParkVault.address
 const CONTRACT_ABI = CONTRACTS.BaseParkVault.abi
@@ -31,6 +32,8 @@ CONTRACT_ABI,
 provider
 )
 
+/* ambil event */
+
 const depositEvents = await contract.queryFilter(
 contract.filters.Deposit(),
 0,
@@ -49,12 +52,15 @@ contract.filters.EmergencyWithdraw(),
 "latest"
 )
 
+/* format data */
+
 const deposits = await Promise.all(
 depositEvents.map(async tx => ({
 
 type:"Deposit",
 amount:ethers.formatEther(tx.args.amount),
 hash:tx.transactionHash,
+blockNumber:tx.blockNumber,
 time:await getTimestamp(provider,tx.blockNumber)
 
 }))
@@ -66,6 +72,7 @@ withdrawEvents.map(async tx => ({
 type:"Withdraw",
 amount:ethers.formatEther(tx.args.amount),
 hash:tx.transactionHash,
+blockNumber:tx.blockNumber,
 time:await getTimestamp(provider,tx.blockNumber)
 
 }))
@@ -77,20 +84,33 @@ emergencyEvents.map(async tx => ({
 type:"Emergency",
 amount:ethers.formatEther(tx.args.amount),
 hash:tx.transactionHash,
+blockNumber:tx.blockNumber,
 time:await getTimestamp(provider,tx.blockNumber)
 
 }))
 )
 
+/* gabungkan */
+
 const allTx = [...deposits,...withdraws,...emergencies]
 
-allTx.sort((a,b)=> new Date(b.time) - new Date(a.time))
+/* transaksi terbaru di atas */
+
+allTx.sort((a,b)=> b.blockNumber - a.blockNumber)
+
+const newest = allTx[0]?.hash
+
+if(newest && newest !== lastHash){
+
+setLastHash(newest)
+
+}
 
 setHistory(allTx)
 
 }catch(err){
 
-console.log("History load error:",err)
+console.log("History error:",err)
 
 }
 
@@ -100,7 +120,7 @@ useEffect(()=>{
 
 loadHistory()
 
-/* auto refresh setiap 15 detik */
+/* auto refresh */
 
 const interval = setInterval(()=>{
 
@@ -114,21 +134,31 @@ return ()=> clearInterval(interval)
 
 return(
 
-<div className="neon-card">
+<div className="neon-card history">
 
 <h2>Riwayat Transaksi</h2>
 
 {history.length===0 && (
+
 <p>Belum ada transaksi.</p>
 )}
 
 {history.map((tx,i)=>(
 
-<div className="tx new-tx" key={i}>
+<div
+className={`tx ${tx.hash === lastHash ? "new-tx" : ""}`}
+key={i}
+>
 
 <div>
 
-<span>{tx.type}</span>
+<span>
+
+{tx.type === "Deposit" && "⬇ Deposit"}
+{tx.type === "Withdraw" && "⬆ Withdraw"}
+{tx.type === "Emergency" && "⚠ Emergency"}
+
+</span>
 
 <br/>
 
@@ -140,6 +170,7 @@ return(
 href={`https://basescan.org/tx/${tx.hash}`}
 target="_blank"
 rel="noreferrer"
+
 >
 
 Lihat Tx
