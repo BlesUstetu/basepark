@@ -319,3 +319,43 @@ text-decoration:none;
 .tx a:hover{
 text-decoration:underline;
 }
+
+.tx{
+display:flex;
+justify-content:space-between;
+padding:14px;
+border-bottom:1px solid #1f1f2e;
+}
+
+.tx small{
+color:#8a8aa3;
+font-size:12px;
+}
+
+.tx a{
+font-size:11px;
+color:#00ffd5;
+text-decoration:none;
+}
+
+.tx a:hover{
+text-decoration:underline;
+}
+
+/* animasi transaksi baru */
+
+.new-tx{
+animation:newTxGlow 1.2s ease;
+}
+
+@keyframes newTxGlow{
+
+0%{
+background:rgba(0,255,213,0.15);
+}
+
+100%{
+background:transparent;
+}
+
+}
