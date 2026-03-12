@@ -64,7 +64,7 @@ margin-bottom:50px;
 }
 
 /* ============================= */
-/* DASHBOARD GRID */
+/* DASHBOARD */
 /* ============================= */
 
 .dashboard{
@@ -88,8 +88,6 @@ overflow:hidden;
 transition:all .35s ease;
 }
 
-/* neon border */
-
 .neon-card:before{
 content:"";
 position:absolute;
@@ -105,8 +103,6 @@ mask-composite:exclude;
 opacity:.15;
 pointer-events:none;
 }
-
-/* hover effect */
 
 .neon-card:hover{
 transform:translateY(-5px);
@@ -152,7 +148,7 @@ box-shadow:0 0 10px rgba(0,255,213,.3);
 }
 
 /* ============================= */
-/* BUTTONS */
+/* BUTTON */
 /* ============================= */
 
 .buttons{
@@ -174,8 +170,6 @@ transition:all .25s ease;
 position:relative;
 overflow:hidden;
 }
-
-/* button shine */
 
 button:before{
 content:"";
@@ -250,8 +244,6 @@ font-size:14px;
 margin-top:60px;
 }
 
-/* transaction row */
-
 .tx{
 display:flex;
 justify-content:space-between;
@@ -265,8 +257,6 @@ transition:all .25s ease;
 background:#0e0e25;
 }
 
-/* timestamp */
-
 .tx small{
 display:block;
 color:#8a8aa3;
@@ -274,14 +264,10 @@ font-size:12px;
 margin-top:2px;
 }
 
-/* amount */
-
 .tx span:last-child{
 font-weight:600;
 color:#cfcfe8;
 }
-
-/* basescan link */
 
 .tx a{
 display:inline-block;
@@ -296,7 +282,7 @@ text-decoration:underline;
 }
 
 /* ============================= */
-/* NEW TRANSACTION ANIMATION */
+/* NEW TX ANIMATION */
 /* ============================= */
 
 .new-tx{
@@ -305,34 +291,30 @@ animation:newTxGlow 1.2s ease;
 
 @keyframes newTxGlow{
 
-0%{
-background:rgba(0,255,213,0.18);
-}
-
-40%{
-background:rgba(0,255,213,0.12);
-}
-
-100%{
-background:transparent;
-}
+0%{background:rgba(0,255,213,0.18);}
+40%{background:rgba(0,255,213,0.12);}
+100%{background:transparent;}
 
 }
 
 /* ============================= */
-/* TRANSACTION TYPE COLORS */
+/* CHART */
 /* ============================= */
 
-.tx.deposit span:first-child{
+.chart-container{
+position:relative;
+}
+
+.tvl-value{
+font-size:26px;
+font-weight:700;
+margin-bottom:10px;
 color:#00ffd5;
+text-shadow:0 0 10px rgba(0,255,213,.6);
 }
 
-.tx.withdraw span:first-child{
-color:#ff8a8a;
-}
-
-.tx.emergency span:first-child{
-color:#ffaa33;
+.chart-container svg{
+filter:drop-shadow(0 0 8px rgba(0,255,213,.4));
 }
 
 /* ============================= */
@@ -349,30 +331,13 @@ gap:24px;
 .title{
 font-size:28px;
 }
-}
 
 .container{
 padding:30px 15px;
 }
-  
-.chart-container{
-position:relative;
-}
 
-.tvl-value{
-font-size:26px;
-font-weight:700;
-margin-bottom:10px;
-color:#00ffd5;
-text-shadow:0 0 10px rgba(0,255,213,.6);
-}
-
-/* glow chart */
-
-.chart-container svg{
-filter:drop-shadow(0 0 8px rgba(0,255,213,.4));
-}
 .header{
 padding:16px 18px;
 }
 
+}
