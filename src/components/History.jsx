@@ -9,8 +9,6 @@ const [history,setHistory] = useState([])
 const CONTRACT_ADDRESS = CONTRACTS.BaseParkVault.address
 const CONTRACT_ABI = CONTRACTS.BaseParkVault.abi
 
-/* ambil waktu dari block */
-
 async function getTimestamp(provider, blockNumber){
 
 const block = await provider.getBlock(blockNumber)
@@ -18,8 +16,6 @@ const block = await provider.getBlock(blockNumber)
 return new Date(block.timestamp * 1000).toLocaleString()
 
 }
-
-/* load history */
 
 async function loadHistory(){
 
@@ -34,8 +30,6 @@ CONTRACT_ADDRESS,
 CONTRACT_ABI,
 provider
 )
-
-/* ambil events */
 
 const depositEvents = await contract.queryFilter(
 contract.filters.Deposit(),
@@ -55,17 +49,12 @@ contract.filters.EmergencyWithdraw(),
 "latest"
 )
 
-/* format data */
-
 const deposits = await Promise.all(
 depositEvents.map(async tx => ({
 
 type:"Deposit",
-
 amount:ethers.formatEther(tx.args.amount),
-
 hash:tx.transactionHash,
-
 time:await getTimestamp(provider,tx.blockNumber)
 
 }))
@@ -75,11 +64,8 @@ const withdraws = await Promise.all(
 withdrawEvents.map(async tx => ({
 
 type:"Withdraw",
-
 amount:ethers.formatEther(tx.args.amount),
-
 hash:tx.transactionHash,
-
 time:await getTimestamp(provider,tx.blockNumber)
 
 }))
@@ -89,21 +75,16 @@ const emergencies = await Promise.all(
 emergencyEvents.map(async tx => ({
 
 type:"Emergency",
-
 amount:ethers.formatEther(tx.args.amount),
-
 hash:tx.transactionHash,
-
 time:await getTimestamp(provider,tx.blockNumber)
 
 }))
 )
 
-/* gabungkan dan urutkan terbaru */
-
 const allTx = [...deposits,...withdraws,...emergencies]
 
-allTx.sort((a,b)=> b.time.localeCompare(a.time))
+allTx.sort((a,b)=> new Date(b.time) - new Date(a.time))
 
 setHistory(allTx)
 
@@ -119,8 +100,17 @@ useEffect(()=>{
 
 loadHistory()
 
-},[])
+/* auto refresh setiap 15 detik */
 
+const interval = setInterval(()=>{
+
+loadHistory()
+
+},15000)
+
+return ()=> clearInterval(interval)
+
+},[])
 
 return(
 
@@ -134,7 +124,7 @@ return(
 
 {history.map((tx,i)=>(
 
-<div className="tx" key={i}>
+<div className="tx new-tx" key={i}>
 
 <div>
 
