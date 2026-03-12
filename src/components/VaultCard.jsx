@@ -23,6 +23,8 @@ async function detectWallet(){
 
 if(!window.ethereum) return
 
+try{
+
 const provider = new ethers.BrowserProvider(window.ethereum)
 
 const accounts = await provider.send("eth_accounts",[])
@@ -33,12 +35,18 @@ setWallet(accounts[0])
 
 }
 
+}catch(err){
+
+console.log("Wallet detect error",err)
+
+}
+
 }
 
 
 /* ---------------- LOAD DATA ---------------- */
 
-async function loadData(retry=0){
+async function loadData(){
 
 try{
 
@@ -68,12 +76,6 @@ setUserBalance(ethers.formatEther(userBal))
 
 console.log("RPC error",err)
 
-if(retry<3){
-
-setTimeout(()=>loadData(retry+1),2000)
-
-}
-
 }
 
 }
@@ -82,6 +84,8 @@ setTimeout(()=>loadData(retry+1),2000)
 /* ---------------- INIT ---------------- */
 
 useEffect(()=>{
+
+detectWallet()
 
 loadData()
 
@@ -93,14 +97,19 @@ let handleChain
 if(window.ethereum){
 
 handleAccounts = (acc)=>{
+
 setWallet(acc[0] || null)
+
 }
 
 handleChain = ()=>{
+
 loadData()
+
 }
 
 window.ethereum.on("accountsChanged", handleAccounts)
+
 window.ethereum.on("chainChanged", handleChain)
 
 }
@@ -110,13 +119,17 @@ return ()=>{
 clearInterval(interval)
 
 if(window.ethereum){
+
 window.ethereum.removeListener("accountsChanged", handleAccounts)
+
 window.ethereum.removeListener("chainChanged", handleChain)
-}
 
 }
 
-},[])   // ✅ hanya dijalankan sekali
+}
+
+},[wallet])
+
 
 /* ---------------- PREVIEW ---------------- */
 
@@ -127,6 +140,19 @@ const feePreview = amount
 const netDeposit = amount
 ? Number(amount)-feePreview
 :0
+
+
+/* ---------------- INPUT HANDLER ---------------- */
+
+function handleInput(value){
+
+if(/^\d*\.?\d*$/.test(value)){
+
+setAmount(value)
+
+}
+
+}
 
 
 /* ---------------- DEPOSIT ---------------- */
@@ -143,9 +169,9 @@ return
 
 }
 
-if(!amount){
+if(!amount || Number(amount)<=0){
 
-setError("Enter deposit amount")
+setError("Enter valid deposit amount")
 
 return
 
@@ -200,9 +226,9 @@ return
 
 }
 
-if(!amount){
+if(!amount || Number(amount)<=0){
 
-setError("Enter withdraw amount")
+setError("Enter valid withdraw amount")
 
 return
 
@@ -279,10 +305,11 @@ return(
 </div>
 
 <input
-type="number"
+type="text"
+inputMode="decimal"
 placeholder="0.0 ETH"
 value={amount}
-onChange={(e)=>setAmount(e.target.value)}
+onChange={(e)=>handleInput(e.target.value)}
 />
 
 <button className="max-btn" onClick={setMax}>
